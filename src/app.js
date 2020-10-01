@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const data = require('./data');
 
 const express = require('express');
 const app = new express();
@@ -10,10 +11,9 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static(path.join(__dirname, '/public')));
 
-let accountData = fs.readFileSync(path.join(__dirname, '/json')+'/accounts.json','utf8');
-let userData = fs.readFileSync(path.join(__dirname, '/json')+'/users.json','utf8');
-const accounts = JSON.parse(accountData);
-const users = JSON.parse(userData);
+const accounts = data.accounts;
+const users = data.users;
+const writeJSON = data.writeJSON;
 app.get('/', (req, res) => {  
     res.render('index', { title: 'Account Summary', accounts:accounts })
 });
@@ -58,9 +58,9 @@ app.post('/transfer', function (req, res) {
     accounts[from].balance = newBalance;
     accounts[to].balance = transferBalance;
    
-    let accountsJSON = JSON.stringify(accounts);
-    var file = path.join(__dirname, '/json/accounts.json');
-    fs.writeFileSync(file, accountsJSON, 'utf8')
+    //var accountsJSON = JSON.stringify(accounts);
+    const accountsJSON = JSON.stringify(accounts);
+    writeJSON(accountsJSON);
     res.render("transfer",{
         message: "Transfer Completed"
     })
@@ -74,10 +74,8 @@ app.post('/payment', (req, res) => {
     var creditBalance = accounts.credit.balance;
     accounts.credit.balance = parseInt(creditBalance)-parseInt(amount);
     accounts.credit.available = parseInt(accounts.credit.available)+ parseInt(amount);
-    let accountsJSON = JSON.stringify(accounts);
-   
-    var file = path.join(__dirname, '/json/accounts.json');
-    fs.writeFileSync(file, accountsJSON, 'utf8')
+    const accountData = JSON.stringify(accounts)
+    writeJSON(accountData);
     res.render('payment', { title: 'Payment', message: "Payment Successful", account: accounts.credit })
 });
 app.listen(3000, () => { console.log('PS Project Running on port 3000!') });
