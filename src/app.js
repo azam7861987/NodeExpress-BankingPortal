@@ -1,29 +1,14 @@
-const path = require('path')
-const express = require('express')
-const fs = require('fs')
+const fs = require('fs');
+const path = require('path');
 
-const ejs = require('ejs')
+const express = require('express');
+const app = new express();
 
-const app = express()
-const publicDirectoryPath = path.join(__dirname, '/public')
-console.log(__dirname)
-const viewsPath = path.join(__dirname, '/views')
-console.log(viewsPath)
+app.set('views',path.join(__dirname, '/views'));
+app.set('view engine','ejs');
 
-app.set('view engine', 'ejs')
-app.set('views', viewsPath)
+app.use(express.static(path.join(__dirname, '/public')));
 
+app.get('/', (req, res) => res.render('index', { title: 'Index' }));
 
-// Setup static directory to serve
-app.use(express.static(publicDirectoryPath))
-
-app.get('/', (req, res) => {
-    res.render("index",{
-        title:"Index"
-    })
-    //res.send("hello")
-})
-
-app.listen(3000, () => {
-    console.log('PS Project Running on port 3000!')
-})
+app.listen(3000, () => { console.log('PS Project Running on port 3000!') });
